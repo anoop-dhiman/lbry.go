@@ -109,7 +109,7 @@ func (rpc *rpcReceiver) IterativeFindValue(r *http.Request, args *RpcIterativeFi
 	if err != nil {
 		return err
 	}
-	foundContacts, found, err := FindContacts(rpc.dht.node, key, false, nil)
+	foundContacts, found, err := FindContacts(rpc.dht.node, key, true, nil)
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,7 @@ package dht
 import (
 	"fmt"
 	"net"
+	"strconv"
 	"strings"
 	"time"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/lbryio/lbry.go/v2/extras/stop"
 
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/cast"
 )
 
 var log *logrus.Logger
@@ -60,7 +60,7 @@ func New(config *Config) *DHT {
 }
 
 func (dht *DHT) connect(conn UDPConn) error {
-	contact, err := getContact(dht.conf.NodeID, dht.conf.Address)
+	contact, err := getContact(dht.conf.NodeID, dht.conf.ExternalIP, dht.conf.DHTPort)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func (dht *DHT) connect(conn UDPConn) error {
 
 // Start starts the dht
 func (dht *DHT) Start() error {
-	listener, err := net.ListenPacket(Network, dht.conf.Address)
+	listener, err := net.ListenPacket(Network, dht.conf.InterfaceIP+":"+strconv.Itoa(dht.conf.DHTPort))
 	if err != nil {
 		return errors.Err(err)
 	}
@@ -200,7 +200,7 @@ func (dht DHT) ID() bits.Bitmap {
 	return dht.contact.ID
 }
 
-func getContact(nodeID, addr string) (Contact, error) {
+func getContact(nodeID, ip string, port int) (Contact, error) {
 	var c Contact
 	if nodeID == "" {
 		c.ID = bits.Rand()
@@ -208,13 +208,8 @@ func getContact(nodeID, addr string) (Contact, error) {
 		c.ID = bits.FromHexP(nodeID)
 	}
 
-	ip, port, err := net.SplitHostPort(addr)
-	if err != nil {
-		return c, errors.Err(err)
-	} else if ip == "" {
+	if ip == "" {
 		return c, errors.Err("address does not contain an IP")
-	} else if port == "" {
-		return c, errors.Err("address does not contain a port")
 	}
 
 	c.IP = net.ParseIP(ip)
@@ -222,10 +217,7 @@ func getContact(nodeID, addr string) (Contact, error) {
 		return c, errors.Err("invalid ip")
 	}
 
-	c.Port, err = cast.ToIntE(port)
-	if err != nil {
-		return c, errors.Err(err)
-	}
+	c.Port = port
 
 	return c, nil
 }

@@ -1,16 +1,16 @@
 package dht
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/lbryio/lbry.go/v2/dht/bits"
 )
 
 const (
-	Network         = "udp4"
-	DefaultPort     = 4444
-	DefaultPeerPort = 3333
+	Network            = "udp4"
+	DefaultInterfaceIP = "0.0.0.0"
+	DefaultPort        = 4444
+	DefaultPeerPort    = 3333
 
 	DefaultAnnounceRate   = 10               // send at most this many announces per second
 	DefaultReannounceTime = 50 * time.Minute // should be a bit less than hash expiration time
@@ -40,8 +40,12 @@ const (
 
 // Config represents the configure of dht.
 type Config struct {
-	// this node's address. format is `ip:port`
-	Address string
+	// this node's external ip address
+	ExternalIP string
+	// this node's interface ip address
+	InterfaceIP string
+	// this node's dht port
+	DHTPort int
 	// the seed nodes through which we can join in dht network
 	SeedNodes []string
 	// the hex-encoded node id for this node. if string is empty, a random id will be generated
@@ -63,7 +67,9 @@ type Config struct {
 // NewStandardConfig returns a Config pointer with default values.
 func NewStandardConfig() *Config {
 	return &Config{
-		Address: "0.0.0.0:" + strconv.Itoa(DefaultPort),
+		InterfaceIP: DefaultInterfaceIP,
+		ExternalIP:  DefaultInterfaceIP,
+		DHTPort:     DefaultPort,
 		SeedNodes: []string{
 			"lbrynet1.lbry.com:4444",
 			"lbrynet2.lbry.com:4444",

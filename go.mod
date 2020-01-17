@@ -1,4 +1,4 @@
-module github.com/lbryio/lbry.go/v2
+module github.com/anoop-dhiman/lbry.go/v2
 
 replace github.com/btcsuite/btcd => github.com/lbryio/lbrycrd.go v0.0.0-20200203050410-e1076f12bf19
 
