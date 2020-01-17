@@ -100,7 +100,7 @@ type RpcIterativeFindValueArgs struct {
 }
 
 type RpcIterativeFindValueResult struct {
-	Contacts   []Contact
+	Contacts   []ContactResponse
 	FoundValue bool
 }
 
@@ -109,20 +109,34 @@ func (rpc *rpcReceiver) IterativeFindValue(r *http.Request, args *RpcIterativeFi
 	if err != nil {
 		return err
 	}
-	foundContacts, found, err := FindContacts(rpc.dht.node, key, false, nil)
+	foundContacts, found, err := FindContacts(rpc.dht.node, key, true, nil)
 	if err != nil {
 		return err
 	}
-	result.Contacts = foundContacts
+	for _, c := range foundContacts {
+		result.Contacts = append(result.Contacts, ContactResponse{
+			ID:       c.ID.String(),
+			IP:       c.IP,
+			Port:     c.Port,
+			PeerPort: c.PeerPort,
+		})
+	}
 	result.FoundValue = found
 	return nil
+}
+
+type ContactResponse struct {
+	ID       string
+	IP       net.IP
+	Port     int // the udp port used for the dht
+	PeerPort int // the tcp port a peer can be contacted on for blob requests
 }
 
 type RpcBucketResponse struct {
 	Start       string
 	End         string
 	NumContacts int
-	Contacts    []Contact
+	Contacts    []ContactResponse
 }
 
 type RpcRoutingTableResponse struct {
@@ -135,11 +149,20 @@ func (rpc *rpcReceiver) GetRoutingTable(r *http.Request, args *struct{}, result 
 	result.NodeID = rpc.dht.node.id.String()
 	result.NumBuckets = len(rpc.dht.node.rt.buckets)
 	for _, b := range rpc.dht.node.rt.buckets {
+		contacts := []ContactResponse{}
+		for _, c := range b.Contacts() {
+			contacts = append(contacts, ContactResponse{
+				ID:       c.ID.String(),
+				IP:       c.IP,
+				Port:     c.Port,
+				PeerPort: c.PeerPort,
+			})
+		}
 		result.Buckets = append(result.Buckets, RpcBucketResponse{
 			Start:       b.Range.Start.String(),
 			End:         b.Range.End.String(),
 			NumContacts: b.Len(),
-			Contacts:    b.Contacts(),
+			Contacts:    contacts,
 		})
 	}
 	return nil

@@ -44,7 +44,8 @@ func TestingCreateNetwork(t *testing.T, numNodes int, bootstrap, concurrent bool
 	for i := 0; i < numNodes; i++ {
 		c := NewStandardConfig()
 		c.NodeID = bits.Rand().Hex()
-		c.Address = testingDHTIP + ":" + strconv.Itoa(firstPort+i)
+		c.InterfaceIP = testingDHTIP
+		c.DHTPort = firstPort + i
 		c.SeedNodes = seeds
 		dht := New(c)
 
