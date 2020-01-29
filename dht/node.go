@@ -457,6 +457,7 @@ func (n *Node) startRoutingTableGrooming() {
 		select {
 		case <-refreshTicker.C:
 			RoutingTableRefresh(n, tRefresh, n.grp.Child())
+			n.store.RemoveExpiredContacts()
 		case <-n.grp.Ch():
 			return
 		}
