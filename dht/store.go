@@ -73,3 +73,21 @@ func (s *contactStore) CountStoredHashes() int {
 	defer s.lock.RUnlock()
 	return len(s.hashes)
 }
+
+func (s *contactStore) PrintStoreData() {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+
+	log.Println("######>>>>>> Hashes <<<<<<######")
+	for hash, nodes := range s.hashes {
+		log.Println("######>>>>>>", hash.HexShort())
+		for id := range nodes {
+			log.Println("######>>>", id.HexShort())
+		}
+	}
+
+	log.Println("######>>>>>> Contacts <<<<<<######")
+	for id, contact := range s.contacts {
+		log.Println("######>>>", id.HexShort(), contact.IP.String())
+	}
+}

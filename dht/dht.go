@@ -194,6 +194,7 @@ func (dht *DHT) PrintState() {
 	for _, line := range strings.Split(dht.node.rt.BucketInfo(), "\n") {
 		log.Println(line)
 	}
+	dht.node.store.PrintStoreData()
 }
 
 func (dht DHT) ID() bits.Bitmap {
