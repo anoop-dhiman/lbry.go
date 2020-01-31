@@ -23,17 +23,27 @@ func New(data []byte) (Stream, error) {
 
 	return makeStream(data, key, ivs, "", "")
 }
-// New creates a new Stream from a byte slice
-func NewWithTitle(data []byte , title string ) (Stream, error) {
-    key := randIV()
-    ivs := make([][]byte, numContentBlobs(data)+1) // +1 for terminating 0-length blob
-    for i := range ivs {
-        ivs[i] = randIV()
 
-    }
+// NewWithTitle creates a new Stream from a byte slice
+func NewWithTitle(data []byte, title string) (Stream, error) {
+	key := randIV()
+	ivs := make([][]byte, numContentBlobs(data)+1) // +1 for terminating 0-length blob
+	for i := range ivs {
+		ivs[i] = randIV()
+	}
 
-    return makeStream(data, key, ivs, title, "")
+	return makeStream(data, key, ivs, title, "")
+}
 
+// NewWithStreamName creates a new Stream from a byte slice
+func NewWithStreamName(data []byte, streamName, suggestedFilename string) (Stream, error) {
+	key := randIV()
+	ivs := make([][]byte, numContentBlobs(data)+1) // +1 for terminating 0-length blob
+	for i := range ivs {
+		ivs[i] = randIV()
+	}
+
+	return makeStream(data, key, ivs, streamName, suggestedFilename)
 }
 
 // Reconstruct creates a stream from the given data using predetermined IVs and key from the SD blob
