@@ -63,7 +63,7 @@ type Node struct {
 }
 
 // NewNode returns an initialized Node's pointer.
-func NewNode(id bits.Bitmap) *Node {
+func NewNode(id bits.Bitmap, tokens *tokenManager) *Node {
 	return &Node{
 		id:    id,
 		rt:    newRoutingTable(id),
@@ -73,7 +73,7 @@ func NewNode(id bits.Bitmap) *Node {
 		transactions: make(map[messageID]*transaction),
 
 		grp:    stop.New(),
-		tokens: &tokenManager{},
+		tokens: tokens,
 	}
 }
 

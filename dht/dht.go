@@ -66,7 +66,11 @@ func (dht *DHT) connect(conn UDPConn) error {
 	}
 
 	dht.contact = contact
-	dht.node = NewNode(contact.ID)
+	dht.node = NewNode(contact.ID, &tokenManager{
+		secret:        dht.conf.Tokens.Secret,
+		prevSecret:    dht.conf.Tokens.PrevSecret,
+		tokenUpdateCh: dht.conf.TokenUpdateNotificationCh,
+	})
 	dht.tokenCache = newTokenCache(dht.node, tokenSecretRotationInterval)
 
 	return dht.node.Connect(conn)
