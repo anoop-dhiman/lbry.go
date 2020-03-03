@@ -62,6 +62,10 @@ type Config struct {
 	AnnounceRate int
 	// channel that will receive notifications about announcements
 	AnnounceNotificationCh chan announceNotification
+	// existing tokens if any
+	Tokens Tokens
+	// channel that will receive notifications about token updates
+	TokenUpdateNotificationCh chan Tokens
 }
 
 // NewStandardConfig returns a Config pointer with default values.
