@@ -220,6 +220,13 @@ func (d *Client) AddressUnused(account *string) (*AddressUnusedResponse, error) 
 	})
 }
 
+func (d *Client) TransactionShow(txid string) (*TransactionSummary, error) {
+	response := new(TransactionSummary)
+	return response, d.call(response, "transaction_show", map[string]interface{}{
+		"txid": txid,
+	})
+}
+
 func (d *Client) ChannelList(account *string, page uint64, pageSize uint64, wid *string) (*ChannelListResponse, error) {
 	if page == 0 {
 		return nil, errors.Err("pages start from 1")
@@ -473,10 +480,11 @@ func (d *Client) Status() (*StatusResponse, error) {
 	return response, d.call(response, "status", map[string]interface{}{})
 }
 
-func (d *Client) TransactionList(account *string, page uint64, pageSize uint64) (*TransactionListResponse, error) {
+func (d *Client) TransactionList(account *string, wallet *string, page uint64, pageSize uint64) (*TransactionListResponse, error) {
 	response := new(TransactionListResponse)
 	return response, d.call(response, "transaction_list", map[string]interface{}{
 		"account_id": account,
+		"wallet_id":  wallet,
 		"page":       page,
 		"page_size":  pageSize,
 	})
@@ -623,6 +631,36 @@ func (d *Client) SupportAbandon(claimID *string, txid *string, nout *uint, keep 
 	}
 	structs.DefaultTagName = "json"
 	return response, d.call(response, "support_abandon", structs.Map(args))
+}
+
+func (d *Client) TxoSpend(txoType, claimID, txid, channelID, name, accountID *string) (*[]TransactionSummary, error) {
+	if txoType == nil && claimID == nil && txid == nil && channelID == nil && name == nil {
+		return nil, errors.Err("either txoType or claimID or channelID or name or txid must be supplied")
+	}
+	response := new([]TransactionSummary)
+	args := struct {
+		ClaimID       *string `json:"claim_id,omitempty"`
+		ChannelID     *string `json:"channel_id,omitempty"`
+		Name          *string `json:"name,omitempty"`
+		TxID          *string `json:"claim_id,omitempty"`
+		Type          *string `json:"type,omitempty"`
+		AccountID     *string `json:"account_id,omitempty"`
+		Preview       bool    `json:"preview,omitempty"`
+		Blocking      bool    `json:"blocking,omitempty"`
+		IncludeFullTx bool    `json:"include_full_tx,omitempty"`
+	}{
+		ClaimID:       claimID,
+		ChannelID:     channelID,
+		Name:          name,
+		Type:          txoType,
+		AccountID:     accountID,
+		TxID:          txid,
+		Blocking:      true,
+		Preview:       false,
+		IncludeFullTx: true,
+	}
+	structs.DefaultTagName = "json"
+	return response, d.call(response, "txo_spend", structs.Map(args))
 }
 
 func (d *Client) AccountAdd(accountName string, seed *string, privateKey *string, publicKey *string, singleKey *bool, walletID *string) (*Account, error) {

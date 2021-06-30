@@ -304,7 +304,7 @@ func TestClient_StreamList(t *testing.T) {
 func TestClient_TransactionList(t *testing.T) {
 	_ = os.Setenv("BLOCKCHAIN_NAME", "lbrycrd_regtest")
 	d := NewClient("")
-	got, err := d.TransactionList(nil, 1, 20)
+	got, err := d.TransactionList(nil, nil, 1, 20)
 	if err != nil {
 		t.Error(err)
 		return
@@ -366,6 +366,99 @@ func TestClient_SupportTest(t *testing.T) {
 		return
 	}
 	prettyPrint(*got4)
+}
+
+func TestClient_TxoSpendTest(t *testing.T) {
+	_ = os.Setenv("BLOCKCHAIN_NAME", "lbrycrd_regtest")
+	d := NewClient("")
+	got, err := d.ChannelCreate("@Test"+fmt.Sprintf("%d", time.Now().Unix()), 13.37, ChannelCreateOptions{
+		ClaimCreateOptions: ClaimCreateOptions{
+			Title:       util.PtrToString("Mess with the channels"),
+			Description: util.PtrToString("And you'll get what you deserve"),
+			Tags:        []string{"we", "got", "tags"},
+			Languages:   []string{"en-US"},
+			Locations: []Location{{
+				Country: util.PtrToString("CH"),
+				State:   util.PtrToString("Ticino"),
+				City:    util.PtrToString("Lugano"),
+			}},
+			ThumbnailURL: util.PtrToString("https://scrn.storni.info/2019-04-12_15-43-25-001592625.png"),
+		},
+		Email:      util.PtrToString("niko@lbry.com"),
+		WebsiteURL: util.PtrToString("https://lbry.com"),
+		CoverURL:   util.PtrToString("https://scrn.storni.info/2019-04-12_15-43-25-001592625.png"),
+	})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	time.Sleep(10 * time.Second)
+	got2, err := d.SupportCreate(got.Outputs[0].ClaimID, "1.0", util.PtrToBool(true), nil, nil, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	prettyPrint(*got2)
+
+	got3, err := d.SupportList(nil, 1, 10)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	found := false
+	for _, support := range got3.Items {
+		if support.ClaimID == got.Outputs[0].ClaimID {
+			found = true
+		}
+	}
+	if !found {
+		t.Error(errors.Err("support not found"))
+		return
+	}
+	prettyPrint(*got3)
+	got4, err := d.TxoSpend(util.PtrToString("support"), util.PtrToString(got.Outputs[0].ClaimID), nil, nil, nil, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	prettyPrint(*got4)
+	time.Sleep(10 * time.Second)
+	got3, err = d.SupportList(nil, 1, 10)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	found = false
+	for _, support := range got3.Items {
+		if support.ClaimID == got.Outputs[0].ClaimID {
+			found = true
+		}
+	}
+	if found {
+		t.Error(errors.Err("support found even though it should have been abandoned"))
+		return
+	}
+	prettyPrint(*got3)
+	got4, err = d.TxoSpend(util.PtrToString("channel"), util.PtrToString(got.Outputs[0].ClaimID), nil, nil, nil, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	prettyPrint(*got4)
+	time.Sleep(10 * time.Second)
+
+	got5, err := d.ClaimList(nil, 1, 50)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	for _, claim := range got5.Claims {
+		if claim.ClaimID == got.Outputs[0].ClaimID {
+			t.Error(errors.Err("claim found even though it should have been abandoned"))
+			return
+		}
+	}
+	prettyPrint(*got5)
 }
 
 func TestClient_ClaimSearch(t *testing.T) {
@@ -696,5 +789,19 @@ func TestClient_WalletRemoveWalletAdd(t *testing.T) {
 	if addedWallet.ID != wallet.ID {
 		prettyPrint(*addedWallet)
 		t.Fatalf("wallet ID mismatch, expected %q, got %q", wallet.ID, addedWallet.Name)
+	}
+}
+
+func TestClient_TransactionSummary(t *testing.T) {
+	d := NewClient("https://api.lbry.tv/api/v1/proxy")
+	r, err := d.TransactionShow("d104a1616c6af581e2046819de678f370d624e97cf176f95acaec4b183a42db6")
+	if err != nil {
+		t.Error(err)
+	}
+	if len(r.Outputs) != 2 {
+		t.Fatal("found wrong transaction")
+	}
+	if r.Outputs[0].Amount != "5.0" {
+		t.Error("found wrong lbc amount for transaction.")
 	}
 }

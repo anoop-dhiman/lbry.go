@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/lbryio/lbry.go/v2/extras/errors"
-	c "github.com/lbryio/lbryschema.go/claim"
+	c "github.com/lbryio/lbry.go/v2/schema/stake"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"
@@ -68,12 +68,14 @@ var testNetParams = chaincfg.Params{
 	PubKeyHashAddrID: lbrycrdTestnetPubkeyPrefix,
 	ScriptHashAddrID: lbrycrdTestnetScriptPrefix,
 	PrivateKeyID:     0x1c,
+	Bech32HRPSegwit:  "tlbc",
 }
 
 var regTestNetParams = chaincfg.Params{
 	PubKeyHashAddrID: lbrycrdRegtestPubkeyPrefix,
 	ScriptHashAddrID: lbrycrdRegtestScriptPrefix,
 	PrivateKeyID:     0x1c,
+	Bech32HRPSegwit:  "rlbc",
 }
 
 var ChainParamsMap = map[string]chaincfg.Params{LbrycrdMain: mainNetParams, LbrycrdTestnet: testNetParams, LbrycrdRegtest: regTestNetParams}
@@ -92,7 +94,7 @@ type Client struct {
 }
 
 // New initializes a new Client
-func New(lbrycrdURL string) (*Client, error) {
+func New(lbrycrdURL string, chainParams *chaincfg.Params) (*Client, error) {
 	// Connect to local bitcoin core RPC server using HTTP POST mode.
 
 	u, err := url.Parse(lbrycrdURL)
@@ -106,10 +108,16 @@ func New(lbrycrdURL string) (*Client, error) {
 
 	password, _ := u.User.Password()
 
+	chain := MainNetParams
+	if chainParams != nil {
+		chain = *chainParams
+	}
+
 	connCfg := &rpcclient.ConnConfig{
 		Host:         u.Host,
 		User:         u.User.Username(),
 		Pass:         password,
+		Params:       chain,
 		HTTPPostMode: true, // Bitcoin core only supports HTTP POST mode
 		DisableTLS:   true, // Bitcoin core does not provide TLS by default
 	}
@@ -128,12 +136,12 @@ func New(lbrycrdURL string) (*Client, error) {
 	return &Client{client}, nil
 }
 
-func NewWithDefaultURL() (*Client, error) {
+func NewWithDefaultURL(chainParams *chaincfg.Params) (*Client, error) {
 	url, err := getLbrycrdURLFromConfFile()
 	if err != nil {
 		return nil, err
 	}
-	return New(url)
+	return New(url, chainParams)
 }
 
 var errInsufficientFunds = errors.Base("insufficient funds")
@@ -150,7 +158,7 @@ func (c *Client) SimpleSend(toAddress string, amount float64) (*chainhash.Hash, 
 		return nil, errors.Err(err)
 	}
 
-	hash, err := c.Client.SendFromMinConf("", decodedAddress, lbcAmount, 0)
+	hash, err := c.Client.SendToAddress(decodedAddress, lbcAmount)
 	if err != nil {
 		if err.Error() == "-6: Insufficient funds" {
 			err = errors.Err(errInsufficientFunds)
@@ -263,7 +271,7 @@ const (
 	ClaimSupport
 )
 
-func (c *Client) AddStakeToTx(rawTx *wire.MsgTx, claim *c.ClaimHelper, name string, claimAmount float64, scriptType ScriptType) error {
+func (c *Client) AddStakeToTx(rawTx *wire.MsgTx, claim *c.StakeHelper, name string, claimAmount float64, scriptType ScriptType) error {
 
 	address, err := c.GetNewAddress("")
 	if err != nil {
@@ -306,7 +314,7 @@ func (c *Client) AddStakeToTx(rawTx *wire.MsgTx, claim *c.ClaimHelper, name stri
 	return nil
 }
 
-func (c *Client) CreateChannel(name string, amount float64) (*c.ClaimHelper, *btcec.PrivateKey, error) {
+func (c *Client) CreateChannel(name string, amount float64) (*c.StakeHelper, *btcec.PrivateKey, error) {
 	channel, key, err := NewChannel()
 	if err != nil {
 		return nil, nil, err
