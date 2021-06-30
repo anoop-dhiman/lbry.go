@@ -3,7 +3,7 @@ package stake
 import (
 	"encoding/hex"
 
-	"github.com/lbryio/lbry.go/v2/extras/errors"
+	"github.com/anoop-dhiman/lbry.go/v2/extras/errors"
 	legacy "github.com/lbryio/types/v1/go"
 	pb "github.com/lbryio/types/v2/go"
 

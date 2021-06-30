@@ -1,8 +1,8 @@
 package address
 
 import (
-	"github.com/lbryio/lbry.go/v2/extras/errors"
-	"github.com/lbryio/lbry.go/v2/schema/address/base58"
+	"github.com/anoop-dhiman/lbry.go/v2/extras/errors"
+	"github.com/anoop-dhiman/lbry.go/v2/schema/address/base58"
 )
 
 const lbrycrdMainPubkeyPrefix = byte(85)

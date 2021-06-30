@@ -7,8 +7,8 @@ import (
 	"encoding/hex"
 	"math/big"
 
-	"github.com/lbryio/lbry.go/v2/extras/errors"
-	"github.com/lbryio/lbry.go/v2/schema/address"
+	"github.com/anoop-dhiman/lbry.go/v2/extras/errors"
+	"github.com/anoop-dhiman/lbry.go/v2/schema/address"
 )
 
 const SECP256k1 = "SECP256k1"

@@ -6,7 +6,7 @@ import (
 
 	pb "github.com/lbryio/types/v2/go"
 
-	"github.com/lbryio/lbry.go/v2/schema/keys"
+	"github.com/anoop-dhiman/lbry.go/v2/schema/keys"
 
 	"github.com/btcsuite/btcd/btcec"
 	"gotest.tools/assert"

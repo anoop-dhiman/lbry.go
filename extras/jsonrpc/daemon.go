@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/anoop-dhiman/lbry.go/v2/extras/errors"
 	"github.com/fatih/structs"
-	"github.com/lbryio/lbry.go/v2/extras/errors"
 	"github.com/mitchellh/mapstructure"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"

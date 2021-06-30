@@ -6,8 +6,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/lbryio/lbry.go/v2/extras/errors"
-	c "github.com/lbryio/lbry.go/v2/schema/stake"
+	"github.com/anoop-dhiman/lbry.go/v2/extras/errors"
+	c "github.com/anoop-dhiman/lbry.go/v2/schema/stake"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"

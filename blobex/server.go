@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/lbryio/lbry.go/v2/extras/errors"
+	"github.com/anoop-dhiman/lbry.go/v2/extras/errors"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"

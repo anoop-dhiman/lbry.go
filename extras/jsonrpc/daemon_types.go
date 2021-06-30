@@ -8,10 +8,10 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/lbryio/lbry.go/v2/extras/errors"
-	"github.com/lbryio/lbry.go/v2/stream"
+	"github.com/anoop-dhiman/lbry.go/v2/extras/errors"
+	"github.com/anoop-dhiman/lbry.go/v2/stream"
 
-	schema "github.com/lbryio/lbry.go/v2/schema/stake"
+	schema "github.com/anoop-dhiman/lbry.go/v2/schema/stake"
 	lbryschema "github.com/lbryio/types/v2/go"
 
 	"github.com/shopspring/decimal"

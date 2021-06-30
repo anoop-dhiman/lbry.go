@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lbryio/lbry.go/v2/dht/bits"
-	"github.com/lbryio/lbry.go/v2/extras/errors"
+	"github.com/anoop-dhiman/lbry.go/v2/dht/bits"
+	"github.com/anoop-dhiman/lbry.go/v2/extras/errors"
 )
 
 var testingDHTIP = "127.0.0.1"

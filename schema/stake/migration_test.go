@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lbryio/lbry.go/v2/schema/address"
+	"github.com/anoop-dhiman/lbry.go/v2/schema/address"
 
 	"github.com/btcsuite/btcutil/base58"
 	"gotest.tools/assert"

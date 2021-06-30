@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lbryio/lbry.go/v2/dht/bits"
-	"github.com/lbryio/lbry.go/v2/extras/errors"
-	"github.com/lbryio/lbry.go/v2/extras/stop"
+	"github.com/anoop-dhiman/lbry.go/v2/dht/bits"
+	"github.com/anoop-dhiman/lbry.go/v2/extras/errors"
+	"github.com/anoop-dhiman/lbry.go/v2/extras/stop"
 
 	"github.com/sirupsen/logrus"
 )
