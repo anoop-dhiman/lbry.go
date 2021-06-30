@@ -20,6 +20,14 @@ func New(src io.Reader) (Stream, error) {
 	return NewEncoder(src).Stream()
 }
 
+// NewWithStreamName creates a new Stream from a stream of bytes.
+func NewWithStreamName(src io.Reader, streamName, suggestedFilename string) (Stream, error) {
+	se := NewEncoder(src)
+	se.sd.StreamName = streamName
+	se.sd.SuggestedFileName = suggestedFilename
+	return se.Stream()
+}
+
 // Data returns the file data that a stream encapsulates.
 //
 // Deprecated: use Decode() instead. It's a more accurate name. Data() will be removed in the future.
